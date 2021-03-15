@@ -8,43 +8,116 @@
 \usepackage{array}
 \usepackage{subcaption}
 \usepackage[section]{placeins}
+\usepackage[acronym]{glossaries}
 
 \title{%
-    Protein Isoform Prediction in mRNASeq Experiments \\
+    Protein Isoform Loci Prediction from RNA Sequencing Experiments \\
     \large Thesis Proposal}
 
 \author{Andrei Stanciu}
 \date{December 2020}
 
+
+\makeglossaries
+
 \begin{document}
 
 \maketitle
 
+\section{Introduction - First outline}
+
+This study proposes a suite of software tools that use machine learning models to identify novel protein isoforms from \gls{rnaseq} Data. The suite also comes with a series of data processing and visualisation pipelines that are meant to help identifying new or miss annotated genes. In order to facilitate this, we provide a standalone in-silico data generation pipeline which produces novel RNASeq libraries informed by expected isoform distributions. 
+
+\begin{enumerate}
+    \item Introduction on the basic biology: From DNA to mRNA to protein
+    \item Background on transcription 
+    \item Introduce yeast as a model organism
+    \item Genome annotations
+    \item Introduce RNASequencing
+    \item Present general methods for RNASeq
+    \item Present Ingolia methods for RNASeq and introduce our datasets
+    \item Describe what isoforms are 
+    \item Introduce the problem raised by steinmetz et el (new discoveries on yeast heterogeneity) 
+    \item Talk about existing research on isoform analysis 
+    \item Motivation behind using RNASeq to identify isoforms
+    \item Present the main idea of the tool
+
+\end{enumerate}
 
 
-\section{Introduction} 
-\begin{itemize}
-        
-    \item General Problem Statement
-    \item Biological Background
-    \item Motivation for problem
-\end{itemize}
+\section{Proposal - Introduction}
 
-\section{Literature Review}\label{literature review}
-\begin{itemize}
-    \item Steinmetz Paper(s)
-    \item Ingolia pipeline for  pre-processing
-\end{itemize}
 
-\section{Methods}\label{methods}
+Sequencing DNA has been one of the most impactful discoveries of the past century. With the recent advances \cite{Ingolia2012} in sequencing speed and availability, biologists are turning more and more to computational tools to analyze large data sets covering entire genomes. \gls{rnaseq} has become a widespread and accessible tool for scientists who are pushing the frontiers of science. [some intro aboyt the prep] After a library is prepared in the lab, all the \gls{mrna} present in the cells gets broken down into tinier fragments. \acrshort{rnaseq} reports with single nucleotide precision all these fragments. These fragments become digital reads represented as strings of A, C, G, T/U characters, and are subsequently aligned to the genome (digitally represented as large text files using the same encoding of nucleobases as above). The genome itself is divided in genes which are well annotated {\tiny[TODO: reference to annotations of the yeast genome]}. Each gene consists of three regions: 5’ \gls{utr}, \gls{cds} and 3’\acrshort{utr}. While the \acrshort{cds} is the region that gets translated into protein, the \acrshort{utr}s play an important role in regulation and translation. Many genes are known to have various isoforms - slight variation in length or in splicing - especially in more complex organisms. Understanding these variety of these isoforms could help us gain a more in depth understanding on regulatory mechanisms. For instance, a recent study \cite{Shamir2020} showed that 
+the relative distribution of two isoforms of STAT3 directly influences the expression of a gene correlated with COVID-19 infection. 
+
+While there is significant research in analysing specific protein isoforms, the current methods of analysing isoforms across the whole genome are limited. \acrshort{rnaseq} holds the potential of making isoform analysis accessible and accurate, without extra lab experimentation needed. The tool proposed in this paper is a digital solution which can be run on old \acrshort{rnaseq} experiments, conveying new insights.
+
+Our chosen model organism for implementing and testing isoform prediction is Sacharomyces Cerevisiae, since it is extensively studied and many genes in more complex organisms have homologs in yeast. Scientists have often assumed that for each gene the divisions between the three regions (5'\acrshort{utr}, \acrshort{cds}, 3'\acrshort{utr}) are fixed. contrary to what was previously believed, Pelechano and Steinmetz \cite{Pelechano2013} have shown that S. cerevisiae presents an extensive level of heterogeneity in its transcriptome. In simpler terms, there is variability in the lengths of the 5’UTR and the 3’UTR (i.e. they have multiple isoforms). Thus, in the case of RNASeq experiments, it is nontrivial to know from which isoform each short read comes, especially given that these isoforms are present in various distributions under different conditions. 
+
+It is worth mentioning that there are some alternative methods for identifying isoforms. For instance, UNAGI\cite{Alkadi2020} outperforms the Illumina pipeline when it comes to identifying novel transcripts and does slightly better when it comes to identifying isoforms. Both Alkadi et al. \cite{Alkadi2020} and Pelechano et al. \cite{Pelechano2013} require long reads of cDNA - a more complicated library preparation than the one needed for \acrshort{rnaseq}.
+
+The study poses this question: What is the distribution of transcribed 5’UTR isoforms in an RNASeq experiment, given the findings of Pelechano and Steinmetz \cite{Pelechano2013}? To answer this, we propose developing a tool that takes any \acrshort{rnaseq} dataset together with the Pelechano annotations and outputs the relative distribution of each \acrshort{mrna} isoform. 
+
+{\tiny [Papers for later review]} \cite{Kim2009} \cite{Lee2002} \cite{ReixachsSol2020} \cite{Thorrez2008} 
+
+\section{Proposal - Methods}\label{methods}
 \subsection{Data}
+The main datasets used to run experiments are a series of eight \acrshort{rnaseq} experiments conducted as part of an ongoing study {\tiny[TODO: find a way to cite our experimets]}. These are coming from four biological conditions: two wildtype strains of S. Cerevisiae and two mutants, each coming in two replicates. In addition to these, we will use a list of the gene isoforms found by Pelechano et al. \cite{Pelechano2013}. The same study \cite{Pelechano2013} used a separate \cite{Wilkening2013}  \acrshort{rnaseq} experiment as a benchmark for their findings. Given that we are using the isoform annotations from Pelechano et al. \cite{Pelechano2013}, we will run our analysis on their benchmark dataset as well. Naturally, together with these datasets the annotated S. Cerevisiae genome will also be used. {\tiny[TODO: find a reference for it]}
+
+{\tiny[MAYBE]}
+Running some of our experiments on Ribosome footprint data could provide more insights into the positions of isoform boundaries.
+
 \subsection{Tools}\label{tools}
+{\tiny[TODO: find references for tools and libraries]}
+
+Pre-processing the \acrshort{rnaseq} data is a critical step for our experiments. The pipeline used to filter the reads and align them to the genome was created by Ingolia et al. \cite{Ingolia2012} and it uses \textit{fastx\_toolkit} and \textit{bowtie}. The isoform identification tools are written entirely in python3 and use the following libraries to read and plot the data: \textit{pysam, pandas, pybedtools} and \textit{matplotlib}. 
+
 \subsection{Experiments}\label{experiments}
+\subsubsection{Metagene Analyisis}\label{metagene}
+\acrshort{rnaseq} experiments consist of many short reads (intervals) that align with a gene (are included in a larger interval). Thus, it is important to be able to view read densities - how many reads have aligned to each individual nucleotide - over intervals of interest (often genes, or annotated isoforms). {\tiny [QUESTION: This is one of our main assumption. should it be moved somewhere else?]} For a gene with two isoforms, we expect to see a significant increase in the density right after the beginning of the shorter isoform. This is because the two isoforms overlap the same \acrshort{cds}, and since one is shorter than the other one, its 5'\acrshort{utr} should be completely included in the longer one's 5'\acrshort{utr}. Thus, any read aligned with the gene after the junction can be from either isoform, while a read aligned with the gene between the beginning of the long isoform and the junction must come from the longer isoform. 
+
+Calculating and plotting the read densities for particular genes shows {\tiny [TODO: add a plot]} that \acrshort{rnaseq} data can be very noisy, and that the expected effect is not noticeable even for known isoform junctions. This leads to the next logical question to ask in order to validate (or invalidate) the hypothesis: would considering multiple known isoform junctions at the same time magnify the effect which is otherwise hidden by noise? In order to test this, we developed a visualisation tool that aligns and overlaps the read densities over multiple intervals. The plotted sum of these densities is called a metagene plot. To further investigate our hypothesis, we created a metagene plot of all the known isoform junctions. {\tiny [TODO: add a plot]} These preliminary results lead us to believe the hypothesis has the potential of being true. 
+
+\subsubsection{Random generators \& Simulations}\label{rng}
+In order to verify the observed effects we developed and are currently {\tiny [just for proposal]} developing a series of simulators. In a different experiment we looked at the metagene plot of all known isoform junctions. The observed increase in read density after the junction needs to be compared to a similar density calculated around randomly generated junctions.
+
+The first attempt at random generation picked random positions from anywhere inside the genome. This revealed some complexities of random generation. First, it turns out that intergenic space has a significant number of reads, thus any junctions generated in outside annotated genes has the potential of skewing the density. Additionally, the junctions considered for the initial metagene are all residing inside the longest 5'\acrshort{utr} annotated by Pelechano et al. \cite{Pelechano2013}. Thus, a random junction generator should be genome and experiment aware. Therefore, we \textit{will} implement a random junction generator that generates random junctions informed by a set of parameters, which include a genome file, a set of annotations and whether the 
+generation should follow any distribution (i.e. junctions proportional to the number of junctions identified by Pelechano et al. \cite{Pelechano2013}). With such a generator we hope to employ statistical tests to infer the likely hood of our hypothesis being true. 
+
+One limiting factor of our datasets is that they do not include any a priori knowledge of isoform distributions. Thus, our next goal is to implement a simulation of \acrshort{rnaseq} that takes into account isoform distributions. Thus, such a simulation will start from a genome file and will generate random reads inside of all genes, proportional to weights assigned to each gene. This way, our simulation takes into account the varying levels of expression for each gene. Additionally, we hope to generate a fictional isoform database which informs the relative distributions of each gene. Subsequently, this database will serve to improve our simulation, generating an \acrshort{rnaseq} experiment for a known isoform distribution. 
+
+\subsubsection{Isoform Predictions}\label{prediction}
+The tools mentioned above should inform and provide data to subsequent isoform prediction and identification tools. 
 
 
 
-\bibliography{sp}{}
+\newacronym{rnaseq}{RNASeq}{RNA Sequencing}
+\newacronym{mrna}{mRNA}{Messenger RNA}
+\newacronym{cds}{CDS}{Coding Sequence}
+\newacronym{utr}{UTR}{Untranslated Region}
+
+\section{todo}
+Email aitken with ingredient list for steinmetz
+
+Prediction section of the proposal
+
+Sharing methods
+
+Get working on random generation
+ - Make sure to go through the literature
+
+Looking for assumptions
+
+
+\printglossary[type=\acronymtype,title=Abbreviations]
+
+
+
+\bibliography{sp}
 \bibliographystyle{plain}
+
+{\tiny [TODO: Find a way to properly reference the papers in the text] }
 
 \end{document}
 
