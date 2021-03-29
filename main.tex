@@ -9,9 +9,12 @@
 \usepackage{subcaption}
 \usepackage[section]{placeins}
 \usepackage[acronym]{glossaries}
+\usepackage{setspace}
+
+
 
 \title{%
-    Protein Isoform Loci Prediction from RNA Sequencing Experiments \\
+    mRNA Isoform Loci Prediction from RNA Sequencing Experiments \\
     \large Thesis Proposal}
 
 \author{Andrei Stanciu}
@@ -20,14 +23,69 @@
 
 \makeglossaries
 
+\doublespacing
 \begin{document}
 
 \maketitle
 
-\section{Introduction - First outline}
+\section{Introduction}
 
-This study proposes a suite of software tools that use machine learning models to identify novel protein isoforms from \gls{rnaseq} Data. The suite also comes with a series of data processing and visualisation pipelines that are meant to help identifying new or miss annotated genes. In order to facilitate this, we provide a standalone in-silico data generation pipeline which produces novel RNASeq libraries informed by expected isoform distributions. 
+\subsection{History}
+Genetic sequencing has seen an astonishing development in the past century \cite{Hood2003}. Only in 1953, Watson and Crick \cite{WATSON1953} proposed the now well known double helix structure of DNA. Soon after, in 1977, Maxam and Gilbert \cite{Maxam1977} described a method of sequencing DNA. Back then, it took Sanger et al. \cite{Sanger1977} roughly one year to sequence the genome of a virus, consisting of 5,375 nucleotides. By 1986, Smith et al. \cite{Smith1986} showcased a tool that would sequence roughly 250 nucleotides an hour. 
 
+At the same time, in the 1940s and the 1950s the precursors of modern day computers were being created. Since then, the computing power increased at an exponential rate, as predicted by Moore \cite{Moore2006}. Together with the computing speed also grew the DNA sequencing throughput. While the Human Genome Project took 10 years to complete, Illumina Sequencing \cite{illuminaSeq} was sequencing 18000 human genomes in 2014. This series of breakthroughs serve as the foundation of what is now the 'genomic era', where the average researcher has access to myriads of genomic data sets and have the power to process them on their personal computers.   
+
+\subsection{Biological Background}
+The DNA holds a series of properties that make it suitable for digital analysis. A DNA molecule consists of two chains of nucleotides, also called strands. In turn, a strand of DNA is a series of  base pairs - adenine (A), cytosine (C), guanine (G) and thymine (T), which could come in any combination. These sequences of basepairs encode instructions for making the molecules that support life. 
+
+
+Due to its underlying chemistry, the strand of DNA has two distinct ends called the 5' end and the 3' end, being oriented from the 5' end to the 3'end. Additionally, each nucleotide from one strand pairs with a corresponding nucleotide from the opposite strand. Thus, adenine (A) pairs with thymine (T) and cytosine (C) pairs with guanine (G). This, together with the fact that the two strands of the helix run in opposite (anti parallel) directions, produces for every sequence of DNA a reverse complement sequence. 
+
+Sequences of DNA are copied (transcribed) to RNA and transported outside the nucleus. The RNA is a single stranded chain of nucleotides where Thymine (T) is replaced by Uracil (U). If the RNA holds instructions for making protein it is called \gls{mrna}. Even if only a small fraction of the human DNA codes for proteins, it is now believed that more than 90\% of the human genome gets transcribed \cite{Pertea2012}. Transcription itself is a highly regulated cellular process, responding to various cellular and extracellular signals\cite{Hahn2011}. This gives that the number of \acrshort{mrna}s inside the cell varies significantly from gene to gene, and from cell to cell. The collection of all mRNAs in a cell, called a transcriptome, define the identity of a cell in multi cellular organisms. 
+
+\subsection{Gene Translation}
+Inside the cell the \acrshort{mrna} gets translated into protein. This itself is a highly complex and highly regulated process. The basepairs in an \acrshort{mrna} are grouped in nonoverlapping sequences of 3 nucleotides, called codons. 61 of the possible codons code for a aminoacid, while 3 of them represent a stop codon. Ribosomes - macromomolecular machines consisting of ribosomal RNA and ribosomal proteins - bind to the mRNA and use the information in it to build the appropriate protein, aminoacid by aminoacid. A lot of the complexity and regulation of translation comes from the fact that the beginning and end of a protein are marked by a start and stop codon on the mRNA. Since the mRNA strands are oriented from their 5' end to their 3' end, the region before the start codon on an mRNA is called 5'\gls{utr} and the region following the stop codon is called 3'\acrshort{utr}. The region spanning  between the two codons, which codes for a protein, is  called \gls{utr}. Thus the ribosome buynd to the mRNA has to scan the 5'UTR until it identifies the AUG (start) codon. This codon signals the ribosome to start building the protein. 
+
+\begin{enumerate}
+    \item full details of ribosome translating? 
+    \item Factors that influence translation
+    \item An example of uORFs and how their expression affects the translation of the gene. [what was the canonical example for this?]
+    \item significance of mRNA isoform variety in gene translation
+\end{enumerate}
+
+\subsection{RNASeq}
+    Understanding and comparing the transcriptomes of different cells under different conditions offers sceintists a plethora of new insights. [give examples from papers]. With the wide availability of high throughput sequencing it is now possible to sequence all the RNA  present in an experiment\cite{Kukurba2015}. In the current technological era, such an mRNA experiment usually gives information about millions of basepairs present in a cell. 
+    One common sequencing protocol is the Illumina sequencing. It excels at sequencing relatively short mRNA fragments (on the order of hundreds of nucleotides per fragment). [needs quotations] The way these experiments are prepared and sequenced involve multiple steps which each can indroduce a specific bias. In the case of Illumina sequencing, a biological sample often consists of multiple cells with the same condition. The cells in the sample are broken apart to expose the mRNAs and the mRNAs are filtered out. The purified mRNA subsequently gets broken up in smaller fragments. There are different methods available for fragmentation depending on the experimental design and desired outcomes. The fragmented mRNAs are then reverse transcribed to complementary DNA (cDNA), which is augumented with adapters and barcodes. [What is the purpose of the adapter?]. The barcodes serve as a unique identifier for the experiment. In the case multiple experiments are sequenced at the same time, the barcodes are used to tell which read comes from which experiment. Subsequently, a PCR [citation? details?] reaction amplifies the number of present fragments by making millions [?] of copies of each fragment. [What's the purpose of this? Is it to give us more confidence in the reads] [to be continued]   
+    An additional variation in sequencing methodology comes from paired end versus single end reads. Single end reads are sequences of RNA read from one of the fragments described above. Based on the technology used [citation], for each fragment sequenced there is exactly one single end read. In the case of paired end reads, the RNA fragment is sequenced twice, once from each end. This gives two different reads. The sequencer imposes some limits on the length of the reads, and thus, the selected length of fragments influences the downstream possibilities of analysis. If the selected length is short enough, it is very likely that the two paired reads will overlap. This increases the confidence in each one of the reads. If the length of RNA is larger than twice the sequencing length, it becomes unlikely the two ends will overlap. This later option gives an ordering between pairs of reads and can be used for \textit{de novo} transcriptome assembly \cite{Hlzer2019}.  
+\begin{enumerate}
+    \item Quick intro on the biological preps: cells, mRNA isolation, fragmentation, PCR: note that these process introduce biases in which data gets sequenced
+    \item general methods for sequencing
+    \item paired end versus single end
+    \item ribosome profiling
+    \item our data
+    \item Steinmetz RNASeq data
+    \item note how much variety is in  RNASeq experiments and methods. 
+\end{enumerate}
+
+\subsection{mRNA isoforms in yeast}
+ [ here there are many pepares I saved that I can cite and  talk about]
+
+
+
+\subsection{Previous research/Literature review}
+[papers on isoform analysis]
+
+\subsection{mRNA Isoform  identification }
+[Main goal of our tool]
+\subsubsection{TODO list}
+
+[Maybe use the figure from here as an example http://shadarf.blogspot.com/2017/07/how-to-make-reverse-complement-of-dna.html]
+
+Introduce mRNA, 1 copy of DNA vs many copies of mRNA. 
+Introduce Codons + Aminoacids 
+Protein
+
+\subsection{Introduction Outline}
 \begin{enumerate}
     \item Introduction on the basic biology: From DNA to mRNA to protein
     \item Background on transcription 
@@ -36,13 +94,19 @@ This study proposes a suite of software tools that use machine learning models t
     \item Introduce RNASequencing
     \item Present general methods for RNASeq
     \item Present Ingolia methods for RNASeq and introduce our datasets
+    \item Introduce translation regulation. this is why we're trying to identify mRNA isoforms (in 5'UTR)
     \item Describe what isoforms are 
     \item Introduce the problem raised by steinmetz et el (new discoveries on yeast heterogeneity) 
     \item Talk about existing research on isoform analysis 
     \item Motivation behind using RNASeq to identify isoforms
     \item Present the main idea of the tool
+    \item Present  the additional tools that resulted as a side effect from developing the main tool
 
 \end{enumerate}
+
+Punchline: \\
+
+This study proposes a suite of software tools that use machine learning models to identify novel protein isoforms from \gls{rnaseq} Data. The suite also comes with a series of data processing and visualisation pipelines that are meant to help identifying new or miss annotated genes. In order to facilitate this, we provide a standalone in-silico data generation pipeline which produces novel RNASeq libraries informed by expected isoform distributions. 
 
 
 \section{Proposal - Introduction}
@@ -115,7 +179,7 @@ Looking for assumptions
 
 
 \bibliography{sp}
-\bibliographystyle{plain}
+\bibliographystyle{ieeetr}
 
 {\tiny [TODO: Find a way to properly reference the papers in the text] }
 
