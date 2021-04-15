@@ -31,7 +31,8 @@
 \section{Introduction}
 
 \subsection{History}
-Genetic sequencing has seen an astonishing development in the past century \cite{Hood2003}. Only in 1953, Watson and Crick \cite{WATSON1953} proposed the now well known double helix structure of DNA. Soon after, in 1977, Maxam and Gilbert \cite{Maxam1977} described a method of sequencing DNA. Back then, it took Sanger et al. \cite{Sanger1977} roughly one year to sequence the genome of a virus, consisting of 5,375 nucleotides. By 1986, Smith et al. \cite{Smith1986} showcased a tool that would sequence roughly 250 nucleotides an hour. 
+Genetic sequencing has seen an astonishing development in availability and processing power in the past century
+\cite{Hood2003}. Only in 1953, Watson and Crick \cite{WATSON1953} proposed the now well known double helix structure of DNA. Soon after, in 1977, Maxam and Gilbert \cite{Maxam1977} described a method of sequencing DNA. Back then, it took Sanger et al. \cite{Sanger1977} roughly one year to sequence the genome of a virus, consisting of 5,375 nucleotides. By 1986, Smith et al. \cite{Smith1986} showcased a tool that would sequence roughly 250 nucleotides an hour. 
 
 At the same time, in the 1940s and the 1950s the precursors of modern day computers were being created. Since then, the computing power increased at an exponential rate, as predicted by Moore \cite{Moore2006}. Together with the computing speed also grew the DNA sequencing throughput. While the Human Genome Project took 10 years to complete, Illumina Sequencing \cite{illuminaSeq} was sequencing 18000 human genomes in 2014. This series of breakthroughs serve as the foundation of what is now the 'genomic era', where the average researcher has access to myriads of genomic data sets and have the power to process them on their personal computers.   
 
@@ -55,8 +56,14 @@ Inside the cell the \acrshort{mrna} gets translated into protein. This itself is
 
 \subsection{RNASeq}
     Understanding and comparing the transcriptomes of different cells under different conditions offers sceintists a plethora of new insights. [give examples from papers]. With the wide availability of high throughput sequencing it is now possible to sequence all the RNA  present in an experiment\cite{Kukurba2015}. In the current technological era, such an mRNA experiment usually gives information about millions of basepairs present in a cell. 
+    
     One common sequencing protocol is the Illumina sequencing. It excels at sequencing relatively short mRNA fragments (on the order of hundreds of nucleotides per fragment). [needs quotations] The way these experiments are prepared and sequenced involve multiple steps which each can indroduce a specific bias. In the case of Illumina sequencing, a biological sample often consists of multiple cells with the same condition. The cells in the sample are broken apart to expose the mRNAs and the mRNAs are filtered out. The purified mRNA subsequently gets broken up in smaller fragments. There are different methods available for fragmentation depending on the experimental design and desired outcomes. The fragmented mRNAs are then reverse transcribed to complementary DNA (cDNA), which is augumented with adapters and barcodes. [What is the purpose of the adapter?]. The barcodes serve as a unique identifier for the experiment. In the case multiple experiments are sequenced at the same time, the barcodes are used to tell which read comes from which experiment. Subsequently, a PCR [citation? details?] reaction amplifies the number of present fragments by making millions [?] of copies of each fragment. [What's the purpose of this? Is it to give us more confidence in the reads] [to be continued]   
-    An additional variation in sequencing methodology comes from paired end versus single end reads. Single end reads are sequences of RNA read from one of the fragments described above. Based on the technology used [citation], for each fragment sequenced there is exactly one single end read. In the case of paired end reads, the RNA fragment is sequenced twice, once from each end. This gives two different reads. The sequencer imposes some limits on the length of the reads, and thus, the selected length of fragments influences the downstream possibilities of analysis. If the selected length is short enough, it is very likely that the two paired reads will overlap. This increases the confidence in each one of the reads. If the length of RNA is larger than twice the sequencing length, it becomes unlikely the two ends will overlap. This later option gives an ordering between pairs of reads and can be used for \textit{de novo} transcriptome assembly \cite{Hlzer2019}.  
+    
+    An additional variation in sequencing methodology comes from paired end versus single end reads. Single end reads are sequences of RNA read from one of the fragments described above. Based on the technology used [citation], for each fragment sequenced there is exactly one single end read. In the case of paired end reads, the RNA fragment is sequenced twice, once from each end. This gives two different reads. The sequencer imposes some limits on the length of the reads, and thus, the selected length of fragments influences the downstream possibilities of analysis. If the selected length is short enough, it is very likely that the two paired reads will overlap. This increases the confidence in each one of the reads. If the length of RNA is larger than twice the sequencing length, it becomes unlikely the two ends will overlap. This later option gives an ordering between pairs of reads and can be used for \textit{de novo} transcriptome assembly \cite{Hlzer2019}.
+    
+    Another widely used application of RNASeq is ribosome profiling, proposed by Ingolia et al \cite{Ingolia2012}. By "freezing" in place translating ribosomes one can extract and isolate the mRNA fragments which the ribosome was protecting.These ribosome-protected fragments can later be sequenced. Together with an appropriate dataset of mRNA fragments, one can quantify how efficiently a gene is translated (ribosomes / mRNA fragments). This method can be used to understand how different conditions affect translation [citation], to identify novel genes or identify upstream Open Reading Frames (u\acrshort{orf}s) - reading frames that occur before the 5' start of a canonical \gls{ORF}.
+    
+    
 \begin{enumerate}
     \item Quick intro on the biological preps: cells, mRNA isolation, fragmentation, PCR: note that these process introduce biases in which data gets sequenced
     \item general methods for sequencing
@@ -67,10 +74,15 @@ Inside the cell the \acrshort{mrna} gets translated into protein. This itself is
     \item note how much variety is in  RNASeq experiments and methods. 
 \end{enumerate}
 
-\subsection{mRNA isoforms in yeast}
- [ here there are many pepares I saved that I can cite and  talk about]
+\subsection{Isoforms}
+It is often assumed, for simplicity, that the mRNAs coming from a gene have a similar form. In fact, many genes are known to have various isoforms - slight variation in length or in splicing - especially in more complex organisms. Understanding these variety of these isoforms could help us gain a more in depth understanding on regulatory mechanisms. Known regions of the genome, called introns, lie completely inside a gene's boundary and get removed from the final mRNA. This event is called splicing. For genes that contain introns, there are multiple ways to conduct splicing, which depends on whether introns are removed or not, and at times, whether the regions between introns are kept or not. These alternative splicing variants of mRNA result in similar proteins with variations in function, called protein isoforms. [more details? examples?] 
+While for each protein isoform there exists an mRNA isoform that generated it, there can be different mRNA isoforms producing the same protein. This is mainly because the mRNA has two regions, the 5'\acrshort{utr} and the 3'\acrshort{utr}, that do not get translated into protein. Thus, any variation in length between two mRNAs beyond the \gls{cds} result into two different isoforms. Understanding these variety of these isoforms could help us gain a more in depth understanding on regulatory mechanisms. For instance, a recent study \cite{Shamir2020} showed that the relative distribution of two isoforms of STAT3 directly influences the expression of a gene correlated with COVID-19 infection. 
 
+Since the 5'\acrshort{utr} of an mRNA impacts the way a gene is translated through structure and uORFs, understanding the relative distribution of these mRNA isoforms has the potential of providing new insight into gene translation regulation. [more details] While there is significant research in analysing specific protein isoforms, the current methods of analysing isoforms across the whole genome are limited.  It is worth mentioning that there are some alternative methods for identifying isoforms. For instance, UNAGI\cite{Alkadi2020} outperforms the Illumina pipeline when it comes to identifying novel transcripts and does slightly better when it comes to identifying isoforms. 
 
+Our chosen model organism for implementing and testing isoform prediction is Sacharomyces Cerevisiae, since it is extensively studied and many genes in more complex organisms have homologs in yeast. To show that for each gene the divisions between the three regions (5'\acrshort{utr}, \acrshort{cds}, 3'\acrshort{utr}) are not fixed, Pelechano and Steinmetz \cite{Pelechano2013} have shown that S. cerevisiae presents an extensive level of heterogeneity in its transcriptome. In simpler terms, there is variability in the lengths of the 5’UTR and the 3’UTR. Unfortunately, Both Alkadi et al. \cite{Alkadi2020} and Pelechano et al. \cite{Pelechano2013} require long reads of cDNA - a more complicated library preparation than the one needed for \acrshort{rnaseq}. Thus, \acrshort{rnaseq} holds the potential of making isoform analysis accessible and accurate, without extra lab experimentation needed. The tool proposed in this paper is a digital solution which can be run on old \acrshort{rnaseq} experiments, conveying new insights. Nonetheless, in the case of RNASeq experiments, it is nontrivial to know from which isoform each short read comes, especially given that these isoforms are present in various distributions under different conditions. 
+
+[reorganize this section]
 
 \subsection{Previous research/Literature review}
 [papers on isoform analysis]
@@ -81,9 +93,6 @@ Inside the cell the \acrshort{mrna} gets translated into protein. This itself is
 
 [Maybe use the figure from here as an example http://shadarf.blogspot.com/2017/07/how-to-make-reverse-complement-of-dna.html]
 
-Introduce mRNA, 1 copy of DNA vs many copies of mRNA. 
-Introduce Codons + Aminoacids 
-Protein
 
 \subsection{Introduction Outline}
 \begin{enumerate}
@@ -108,6 +117,52 @@ Punchline: \\
 
 This study proposes a suite of software tools that use machine learning models to identify novel protein isoforms from \gls{rnaseq} Data. The suite also comes with a series of data processing and visualisation pipelines that are meant to help identifying new or miss annotated genes. In order to facilitate this, we provide a standalone in-silico data generation pipeline which produces novel RNASeq libraries informed by expected isoform distributions. 
 
+\section{Methods}
+\subsection{Datasets}
+
+The main datasets used to run experiments are a series of eight \acrshort{rnaseq} experiments conducted as part of an ongoing study {\tiny[TODO: find a way to cite our experiments]}. These are coming from four biological conditions: two wildtype strains of S. Cerevisiae and two mutants, each coming in two replicates. In addition to these, we will use a list of the gene isoforms found by Pelechano et al. \cite{Pelechano2013}. The same study \cite{Pelechano2013} used a separate \cite{Wilkening2013}  \acrshort{rnaseq} experiment as a benchmark for their findings. Given that we are using the isoform annotations from Pelechano et al. \cite{Pelechano2013}, we attempted replicating their \acrshort{rnaseq} experiment. Unfortunately, due to different versions of tools available, replicating the \acrshort{rnaseq} experiment became a difficult task. For more details see the Discussion (\ref{disc}) section. 
+
+\subsection{mRNA pre-processing}
+Processing a \acrshort{rnaseq} experiment takes a significant number of intermediary steps. In the case of the \textit{in vivo} data we are using, the mRNA fragment size was selected to be between 30 and 60 nucleotides long. We used \textit{fastx\_clipper} to remove the standard adapter from the single end reads anad \textit{fastx\_trimmer}  to trimm the first nucleotide of each read and cap the read length to 45nt. Using \textit{bowtie2} we aligned all the reads against a library of ribosomal RNA and discarded all the reads that  contained rRNA. Finally, using $tophat$ we aligned the mRNA fragments to the reference genome. Finally, the aligned files, in \textit{bam} format, are indexed using \textit{SAM tools}. We used the local cluster computer which runs a Ubuntu/Debian [Give accurate details] distribution and uses the $SLURM$ workload manager. All of the scripts used, the annotations and the index files can be found here. [link]
+
+\subsection{Preliminary Analysis}
+\subsubsection{Read density}\label{density}
+The fundamental data structure used in this study is a read density array. For a genomic region of interest it stores the number of reads in an experiment that have aligned to every position. Plotting the values of a read density allows us to get an intuition on the patterns of transcription in a particular experiment, to highlight transcribed regions and to compare them. One important use case in further downstream analysis is looking at the read density around a particular position.Thus, an interval query on this structure is "Given an existing RNASeq experiment, What is the read density array in the range $[a...b]$ in the genome?" 
+This prompts us to implement a structure that supports queries for intervals in an efficient manner. One bottleneck in processing large RNASeq files is reading and iterating through all the reads in the file. This process is slow even when the bam file is indexed. Thus, any naive method that would go through the aligned reads for each query would be too slow. Given that S. Cerevisae's genome is relatively small compared to others (12MB vs 3GB for humans), one can hold into memory the read density accross the whole genome.
+
+Thus, the datas tructure used to represent read density is an array of integers, with $density[i]$ meaning the number of RNA reads that have aligned to position $i$ in the genome. Instead of iterating through all the positions inside a fragment and incrementing the density, I opted for a faster approach. 
+
+\begin{center}
+Let $start(i) =$ the number of reads that start at position $i$ in the genome \\
+Let $end(i) =$ the number of reads that end at position $i$ in the genome \\
+($i-1$ is the last position the fragment covers) \\
+Let $\delta(i) = start(i) - end(i)$ \\
+This gives that $density[i] = \sum\limits_{j=0}^i \delta[i]$ \\
+Finally, $Query(a, b) = density[a:b]$
+
+\end{center}
+
+[Should I give algorithm pseudocode?]
+[proof of correctness?]
+[details on complexity/efficiency?]
+
+\subsubsection{Metagene Analysis}
+A different analysis strategy was inspired by our hypothesis and uses havily the read density data structure described in Section \ref{density}. For a gene with two isoforms, we expect to see a significant increase in the density right after the beginning of the shorter isoform. This is because the two isoforms overlap the same \acrshort{cds}, and since one is shorter than the other one, its 5'\acrshort{utr} should be completely included in the longer one's 5'\acrshort{utr}. Thus, any read aligned with the gene after the junction can be from either isoform, while a read aligned with the gene between the beginning of the long isoform and the junction must come from the longer isoform. 
+
+
+\subsubsection{Hypothesis Testing}
+
+[Actually need to implement a statistical test to test whether the effect we see in the metagene of actual junctions vs randomly selected positions is significant]
+
+
+
+
+
+
+[@caitken \& @astanciu can we double check all the information in this section?]
+
+
+\section{Discussion}\label{disc}
 
 \section{Proposal - Introduction}
 
@@ -126,8 +181,7 @@ The study poses this question: What is the distribution of transcribed 5’UTR i
 {\tiny [Papers for later review]} \cite{Kim2009} \cite{Lee2002} \cite{ReixachsSol2020} \cite{Thorrez2008} 
 
 \section{Proposal - Methods}\label{methods}
-\subsection{Data}
-The main datasets used to run experiments are a series of eight \acrshort{rnaseq} experiments conducted as part of an ongoing study {\tiny[TODO: find a way to cite our experimets]}. These are coming from four biological conditions: two wildtype strains of S. Cerevisiae and two mutants, each coming in two replicates. In addition to these, we will use a list of the gene isoforms found by Pelechano et al. \cite{Pelechano2013}. The same study \cite{Pelechano2013} used a separate \cite{Wilkening2013}  \acrshort{rnaseq} experiment as a benchmark for their findings. Given that we are using the isoform annotations from Pelechano et al. \cite{Pelechano2013}, we will run our analysis on their benchmark dataset as well. Naturally, together with these datasets the annotated S. Cerevisiae genome will also be used. {\tiny[TODO: find a reference for it]}
+
 
 {\tiny[MAYBE]}
 Running some of our experiments on Ribosome footprint data could provide more insights into the positions of isoform boundaries.
@@ -139,7 +193,7 @@ Pre-processing the \acrshort{rnaseq} data is a critical step for our experiments
 
 \subsection{Experiments}\label{experiments}
 \subsubsection{Metagene Analyisis}\label{metagene}
-\acrshort{rnaseq} experiments consist of many short reads (intervals) that align with a gene (are included in a larger interval). Thus, it is important to be able to view read densities - how many reads have aligned to each individual nucleotide - over intervals of interest (often genes, or annotated isoforms). {\tiny [QUESTION: This is one of our main assumption. should it be moved somewhere else?]} For a gene with two isoforms, we expect to see a significant increase in the density right after the beginning of the shorter isoform. This is because the two isoforms overlap the same \acrshort{cds}, and since one is shorter than the other one, its 5'\acrshort{utr} should be completely included in the longer one's 5'\acrshort{utr}. Thus, any read aligned with the gene after the junction can be from either isoform, while a read aligned with the gene between the beginning of the long isoform and the junction must come from the longer isoform. 
+\acrshort{rnaseq} experiments consist of many short reads (intervals) that align with a gene (are included in a larger interval). Thus, it is important to be able to view read densities - how many reads have aligned to each individual nucleotide - over intervals of interest (often genes, or annotated isoforms). {\tiny [QUESTION: This is one of our main assumption. should it be moved somewhere else?]} 
 
 Calculating and plotting the read densities for particular genes shows {\tiny [TODO: add a plot]} that \acrshort{rnaseq} data can be very noisy, and that the expected effect is not noticeable even for known isoform junctions. This leads to the next logical question to ask in order to validate (or invalidate) the hypothesis: would considering multiple known isoform junctions at the same time magnify the effect which is otherwise hidden by noise? In order to test this, we developed a visualisation tool that aligns and overlaps the read densities over multiple intervals. The plotted sum of these densities is called a metagene plot. To further investigate our hypothesis, we created a metagene plot of all the known isoform junctions. {\tiny [TODO: add a plot]} These preliminary results lead us to believe the hypothesis has the potential of being true. 
 
@@ -160,18 +214,7 @@ The tools mentioned above should inform and provide data to subsequent isoform p
 \newacronym{mrna}{mRNA}{Messenger RNA}
 \newacronym{cds}{CDS}{Coding Sequence}
 \newacronym{utr}{UTR}{Untranslated Region}
-
-\section{todo}
-Email aitken with ingredient list for steinmetz
-
-Prediction section of the proposal
-
-Sharing methods
-
-Get working on random generation
- - Make sure to go through the literature
-
-Looking for assumptions
+\newacronym{orf}{ORF}{Open Reading Frame}
 
 
 \printglossary[type=\acronymtype,title=Abbreviations]
