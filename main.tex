@@ -14,6 +14,13 @@
 \usepackage{tikz}
 
 
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=false,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
 
 
 \title{%
@@ -21,7 +28,9 @@
     \large Thesis Proposal}
 
 \author{Andrei Stanciu}
-\date{December 2020}
+\date{December 2020}\date{December 2020}
+
+
 
 
 \makeglossaries
@@ -122,22 +131,22 @@ Punchline: \\
 This study proposes a suite of software tools that use machine learning models to identify novel protein isoforms from \gls{rnaseq} Data. The suite also comes with a series of data processing and visualisation pipelines that are meant to help identifying new or miss annotated genes. In order to facilitate this, we provide a standalone in-silico data generation pipeline which produces novel RNASeq libraries informed by expected isoform distributions. 
 
 \section{Methods}
-\subsection{Datasets}
+\subsection{Datasets}\label{datasets}
 
 The main datasets used to run experiments are a series of eight \acrshort{rnaseq} experiments conducted as part of an ongoing study {\tiny[TODO: find a way to cite our experiments]}. These are coming from four biological conditions: two wildtype strains of S. Cerevisiae and two mutants, each coming in two replicates. In addition to these, we will use a list of the gene isoforms found by Pelechano et al. \cite{Pelechano2013}. The same study \cite{Pelechano2013} used a separate \cite{Wilkening2013}  \acrshort{rnaseq} experiment as a benchmark for their findings. Given that we are using the isoform annotations from Pelechano et al. \cite{Pelechano2013}, we attempted replicating their \acrshort{rnaseq} experiment. Unfortunately, due to different versions of tools available, replicating the \acrshort{rnaseq} experiment became a difficult task. For more details see the Discussion (\ref{disc}) section. 
 
 \subsection{mRNA pre-processing}
-Processing a \acrshort{rnaseq} experiment takes a significant number of intermediary steps. In the case of the \textit{in vivo} data we are using, the mRNA fragment size was selected to be between 30 and 60 nucleotides long. We used \textit{fastx\_clipper} to remove the standard adapter from the single end reads anad \textit{fastx\_trimmer}  to trimm the first nucleotide of each read and cap the read length to 45nt. Using \textit{bowtie2} we aligned all the reads against a library of ribosomal RNA and discarded all the reads that  contained rRNA. Finally, using $tophat$ we aligned the mRNA fragments to the reference genome. Finally, the aligned files, in \textit{bam} format, are indexed using \textit{SAM tools}. We used the local cluster computer which runs a Ubuntu/Debian [Give accurate details] distribution and uses the $SLURM$ workload manager. All of the scripts used, the annotations and the index files can be found here. [link]
+Processing a \acrshort{rnaseq} experiment takes a significant number of intermediary steps. In the case of the \textit{in vivo} data we are using, the mRNA fragment size was selected to be between 30 and 60 nucleotides long. We used \textit{fastx\_clipper} to remove the standard adapter from the single end reads anad \textit{fastx\_trimmer}  to trimm the first nucleotide of each read and cap the read length to 45nt. Using \textit{bowtie2} we aligned all the reads against a library of ribosomal RNA and discarded all the reads that  contained rRNA. Finally, using $tophat$ we aligned the mRNA fragments to the reference genome. Finally, the aligned files, in \textit{bam} format, are indexed using \textit{SAM tools}. We used the local cluster computer which runs a Ubuntu/Debian [Give accurate details] distribution and uses the $SLURM$ workload manager. A flow chart of the data pre-processing can be found in Figure \ref{preprocessing}. All of the scripts used, the annotations and the index files can be found here. [link]
 
 
 \subfile{flowchart.tex}
 
 \subsection{Preliminary Analysis}
 \subsubsection{Read density}\label{density}
-The fundamental data structure used in this study is a read density array. For a genomic region of interest it stores the number of reads in an experiment that have aligned to every position. Plotting the values of a read density allows us to get an intuition on the patterns of transcription in a particular experiment, to highlight transcribed regions and to compare them. One important use case in further downstream analysis is looking at the read density around a particular position.Thus, an interval query on this structure is "Given an existing RNASeq experiment, What is the read density array in the range $[a...b]$ in the genome?" 
-This prompts us to implement a structure that supports queries for intervals in an efficient manner. One bottleneck in processing large RNASeq files is reading and iterating through all the reads in the file. This process is slow even when the bam file is indexed. Thus, any naive method that would go through the aligned reads for each query would be too slow. Given that S. Cerevisae's genome is relatively small compared to others (12MB vs 3GB for humans), one can hold into memory the read density accross the whole genome.
+The fundamental data structure used in this study is a read density array. For a genomic region of interest it stores the number of reads in an experiment that have aligned to every position. Plotting the values of a read density allows us to get an intuition on the patterns of transcription in a particular experiment, to highlight transcribed regions and to compare them. One important use case in further downstream analysis is looking at the read density around a particular position. An example of this structure can be found in Figure \ref{density} .Thus, an interval query on this structure is "Given an existing RNASeq experiment, What is the read density array in the range $[a...b]$ in the genome?" 
+This prompts us to implement a structure that supports queries for intervals in an efficient manner. One bottleneck in processing large RNASeq files is reading and iterating through all the reads in the file. This process is slow even when the bam file is indexed. Thus, any naive method that would go through the aligned reads for each query would be too slow. Given that S. Cerevisae's genome is relatively small compared to others (12MB vs 3GB for humans), one can hold into memory the read density across the whole genome.
 
-Thus, the datas tructure used to represent read density is an array of integers, with $density[i]$ meaning the number of RNA reads that have aligned to position $i$ in the genome. Instead of iterating through all the positions inside a fragment and incrementing the density, I opted for a faster approach. 
+Thus, the data structure used to represent read density is an array of integers, with $density[i]$ meaning the number of RNA reads that have aligned to position $i$ in the genome. Instead of iterating through all the positions inside a fragment and incrementing the density, I opted for a faster approach. 
 
 
 \subfile{read_density_fig.tex}
@@ -155,23 +164,70 @@ Finally, $Query(a, b) = density[a:b]$
 [proof of correctness?]
 [details on complexity/efficiency?]
 
-\subsubsection{Metagene Analysis}
-A different analysis strategy was inspired by our hypothesis and uses havily the read density data structure described in Section \ref{density}. For a gene with two isoforms, we expect to see a significant increase in the density right after the beginning of the shorter isoform. This is because the two isoforms overlap the same \acrshort{cds}, and since one is shorter than the other one, its 5'\acrshort{utr} should be completely included in the longer one's 5'\acrshort{utr}. Thus, any read aligned with the gene after the junction can be from either isoform, while a read aligned with the gene between the beginning of the long isoform and the junction must come from the longer isoform. 
+\subsubsection{Metagene Analysis}\label{metagene_sect}
+A different analysis strategy was inspired by our hypothesis and uses heavily the read density data structure described in Section \ref{density}. The reads that aligned to a particular region are coming from different copies of the mRNA. Not only there are multiple copies of each mRNA but also, these copies can come from different isoforms. The question that arises from this is "can the presence of different mRNA isoforms be identified from the read density alone?". We think yes and here is our hypothesis. For a gene with two isoforms, we expect to see a significant increase in the density right after the beginning of the shorter isoform. This is because the two isoforms overlap the same \acrshort{cds}, and since one is shorter than the other one, its 5'\acrshort{utr} should be completely included in the longer one's 5'\acrshort{utr}. Thus, any read aligned with the gene after the junction can be from either isoform, while a read aligned with the gene between the beginning of the long isoform and the junction must come from the longer isoform. Figure \ref{twoisoforms} shows a randomly generated read distribution that comes from two different isoforms of the same gene. For an example see Figure \ref{twoisoform}. 
 
+\subfile{two-isoform-fig.tex}
 
-\subsubsection{Hypothesis Testing}
+To validate this hypothesis, we implemented a metagene analysis method to look at all isoform junctions at once. We define an isoform junction as the position (inside the 5'UTR of a gene) where a shorter isoform begins. This restricts our dataset to genes that have at least two isoforms. If a gene has $n$ isoforms that differ in 5'UTR length, we obtain $n - 1$ isoform junctions. The differences in read density around isoform can often be overlook because of noise in the data, high frequency of isoform junctions in a relatively small region or low relative distribution between isoforms (for more details on this see the discussion section (\ref{disc})). We believe that aggregating all the densities around known isoform junctions will amplify any local effect in the individual densities. Thus, we define a window of interest (usually -50nt to +50nt around a junction) and we look at the read density in that region. Adding up the densities for all points of interest (isoform junctions) will produce a metagene plot. A simplified example of this can be seen in Figure \ref{metagene}. The algorithm can be easily applied to different scenarios by selecting different sets of points of interest or changing the size of the window. 
+We used the isoforms identified by Pelechano et al. \cite{Pelechano2013} to define known isoforms junctions and we inspected the datasets described in section \ref{datasets}. In addition to that we naively picked the same number of random positions in the 5'UTRs of genes to be candidates for a control group. Thus, visualising the metagene plot for all the known isoform junctions in contrast to the metagene for the control group gives supporting arguments to our hypothesis. The main observation is that the metagene of isoform junctions sees a significant increase around the positions of interest. 
+Thus, define $S$ to be a set of genomic positions of interest. To avoid having overlapping data we randomly selected on junction from each gene containing more than one annotated isoform.  
+To quantify the significance of this observation we define a metric $\delta_n(S)$ for the set $S$ of isoform junctions $\delta_n(S) = metagene(S)[+n] / metagene(S)[-n]$ - the ratio between cummulated read densities $n$ basepairs downstream from any point in $S$ and $n$ basepairs upstream. We generated $10000$ control groups $R_i, i \in [1...10000]$. We took advantage of the large computational power at our disposal and with every iteration we selected the elements of $S$ again, thus generating a collection of sets $S_i$ where each set contains a junction from every gene. Set $S_i$ and $S_j$ will consider different junction candidates from the same gene. We varied $n$ between $1$ and $100$ and computed $\delta_n(R_i)$ and $\delta_n(S_i)$. With this large amount of simulation data, one can generate the sampling distributions of $\delta(n)$ under different conditions. This allows us to run a paired Kolmogorov-Smirnov \cite{Massey1951} statistical test and verify our hypothesis. 
 
-[Actually need to implement a statistical test to test whether the effect we see in the metagene of actual junctions vs randomly selected positions is significant]
+\subfile{meta-fig.tex}
 
+\subsection{\textit{in silico} Data Generation}
 
+In order to verify that read density data holds relevant information for identifying isoform distribution, we implemented a tool that generates random reads informed by randomly generated isoform distribution. The first prototype of data generation starts from the existing annotated CDSes in the genome. For each CDS, we randomly fix the number of 5'UTR isoforms (sampling uniformly between $1$ and $6$). 
 
+Subsequently, we sampled randomly the length of the 5'UTR for each isoform. In this case, we sample from the distribution of all 5'UTR lengths identified by Pelechano et al. \cite{Pelechano2013}. To obtain a parametric distribution of this data, we used the python package \textit{fitter} to iterate through multiple candidate distributions and fit them to the data. We selected a gamma distribution which gave the best fit. 
 
+The next step in this process is generating an underlying distribution for the newly generated isoforms. To accomplish this we generate random weights for each one of the isoforms. Taking the ratio of each individual weight to the total weight of the isoforms gives a relative abundance for each isoform. This method imposes some restrictions on the number of isoforms. Often, as seen in the Pelechano data, a gene will have hundreds of isoforms, out of which only a small number will be frequent. Generating too many isoforms for a gene risks having very low relative frequency among them, making the transition between isoforms indistinguishable from random noise. Therefore, for the first model we decided to generate up to $6$ isoforms for each gene. This often results in different distributions ($1$ dominant isoform and some infrequent isoforms up to isoforms equally distributed). Additionally, the low number of isoforms minimizes the chance that isoform junctions are clustered together. For potential variations of this model, see the Discussion section (\ref{disc}).
 
+Finally, we randomise the number of reads we see across all isoforms of a gene. Given the underlying isoform distribution, it is easy to compute how many reads come from each isoform. Thus, the generation problem is reduced to generating a fixed number of reads (intervals) that are fully contained in an annotated region (the isoform - also an interval). Again, we employ a naive approach to this problem. We fix the read length based on the average read length in our mRNA experiments (44 nt) and we sample $n$ points from the large interval as the beginning of each read. The end points of each read are $length$ base pairs further downstream from the beginning. In this process, one has to pay attention not to generate reads that fall outside of the isoform boundaries. Section \ref{disc} contains an example of a more sophisticated method for read generation.  
+
+This subpipeline for data generation has multiple parameters that can be varied and because its random nature, each dataset is different. Therefore, obtaining large amounts of data for classifier training is very feasible. To verify our hypothesis holds on this data too, we employed the same metagene analysis (Section \ref{metagene_sect}) we used for our RNASeq data.  
+
+\subsection{Machine Learning Models}
+\subsubsection{Choice of model}
+Why not a simple NN, why not unsupervised learning, why RNN in the end. 
+\subsubsection{Dataset \& Feature definition}
+\subsubsection{Model Design}
+\subsubsection{Training and parameter tuning}
+\subsubsection{variations}
 
 [@caitken \& @astanciu can we double check all the information in this section?]
 
 
+\section{Results}\label{res}
+\subsection{Preliminary Results}
+In order to build more confidence in our intuition, we queried the entire genome for patterns that show easily identifiable isoform junctions. Figure \ref{interesting_genes} show four genes that present visible increases in read densities. 
+Additionally, we took all the annotated isoform junctions annotated by Pelechano et al. \cite{Pelechano2013} and we constructed a metagene plot around all the identified junctions. The predicted increase in cumulative read densities can be seen in Figure \ref{large_metagene}. It is possible 
+
+\subsubsection{Hypothesis Testing}
+
+As described in the previous subsection, we simulated 
+
 \section{Discussion}\label{disc}
+\subsection{Data Generation}
+\begin{enumerate}
+    \item Different Sampling distributions 
+    \item Read length variation 
+    \item Bayesian learning for different parameters
+    \item Unsupervised learning for reproducing different patterns and co dependencies of the variables
+    \item Generating UTR lengths given the gene length
+    \item Generating the number of reads in a gene given empirical data / using modern tools from differnt authors
+\end{enumerate}
+
+\section{Pipeline Usage}
+
+\section{Links}
+\begin{enumerate}
+    \item  \url{https://github.com/shobe98/Thesis-Text}
+\item \url{https://github.com/shobe98/bio-thesis}
+
+\end{enumerate}
+
 
 \section{Proposal - Introduction}
 
@@ -188,9 +244,6 @@ It is worth mentioning that there are some alternative methods for identifying i
 The study poses this question: What is the distribution of transcribed 5’UTR isoforms in an RNASeq experiment, given the findings of Pelechano and Steinmetz \cite{Pelechano2013}? To answer this, we propose developing a tool that takes any \acrshort{rnaseq} dataset together with the Pelechano annotations and outputs the relative distribution of each \acrshort{mrna} isoform. 
 
 {\tiny [Papers for later review]} \cite{Kim2009} \cite{Lee2002} \cite{ReixachsSol2020} \cite{Thorrez2008} 
-
-\section{Links}
-
 
 \section{Proposal - Methods}\label{methods}
 
