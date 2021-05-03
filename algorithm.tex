@@ -1,0 +1,20 @@
+
+% From the package documentation:
+% "The package algorithmicx itself doesn’t define any
+% algorithmic commands, but gives a set of macros to 
+% define such a command set.  You may use only 
+% algorithmicx, and define the commands yourself, or you 
+% may use one of the predefined command sets."
+% 
+% Popular predefined command sets include algpseudocode and algpascal. algcompatible should only be used in old documents, and algc is incomplete.
+
+
+\theoremstyle{definition}
+\newtheorem{definition}{Algorithm}
+
+\begin{definition}[Read Density] \label{algo1}
+Let $S$ a set of aligned reads that have a span a [start,end] interval. Let the function $start(i)$ be the number of reads in $S$ that start at position $i$ in the genome. Let the function $end(i)$ be the number of reads in $S$ that end at position $i$ in the genome (i.e. $i-1$ is the last position the fragment covers). Define the function $\Delta(i) = start(i) - end(i)$ This gives that $density[i] = \sum\limits_{j=0}^i \Delta[i]$. Finally, using python indexing, $Query(a, b) = density[a:b]$
+
+
+\end{definition}
+
